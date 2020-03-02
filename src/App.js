@@ -1,26 +1,21 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
-
+import { Container } from '@material-ui/core';
+import Header from './Header'
+import { BrowserRouter as Router, Route } from 'react-router-dom';
+import FormApproved from './Components/Users/Approved/MasterDataCustomer/Form'
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+        <Header />
+        <Container maxWidth="xl">
+          <Router>
+            <Route path="/"  exact >
+              <FormApproved />
+            </Route>
+          </Router>
+        </Container>
     </div>
   );
 }
-
 export default App;
