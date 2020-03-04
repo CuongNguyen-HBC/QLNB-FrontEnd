@@ -23,6 +23,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import HomeIcon from '@material-ui/icons/Home';
 import GroupAddIcon from '@material-ui/icons/GroupAdd';
+import { Link } from '@material-ui/core';
 const useStyles = makeStyles(theme => ({
     list: {
         width: 250,
@@ -138,7 +139,8 @@ export default function PrimarySearchAppBar() {
     >
       <List>
         {/* Trang chủ */}
-          <ListItem button key="Trang chủ">
+       
+          <ListItem button key="Trang chủ" component={Link}  href="./">
             <ListItemIcon><HomeIcon/></ListItemIcon>
             <ListItemText primary="Trang chủ"/>
           </ListItem>
@@ -148,7 +150,7 @@ export default function PrimarySearchAppBar() {
             <ListItemText primary="Hộp Thư"/>
           </ListItem>
         {/* Tạo mã khách hàng */}
-        <ListItem button key="Tạo Mã Khách Hàng">
+        <ListItem button key="Tạo Mã Khách Hàng" component={Link}  href="./masterdata-customer">
             <ListItemIcon><GroupAddIcon/></ListItemIcon>
             <ListItemText primary="Tạo Mã Khách Hàng"/>
           </ListItem>
