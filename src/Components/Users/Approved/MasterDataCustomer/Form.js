@@ -1,5 +1,4 @@
 import React from 'react';
-import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
 import { Typography,Paper,Input,Container,CssBaseline, FormControl,InputLabel,Select,MenuItem, Box,createMuiTheme,ThemeProvider, Icon } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
@@ -21,19 +20,19 @@ import EditLocationIcon from '@material-ui/icons/EditLocation';
 import SendIcon from '@material-ui/icons/Send';
 import { green } from '@material-ui/core/colors';
 import InputAdornment from '@material-ui/core/InputAdornment'
-// import RateReviewIcon from '@material-ui/icons/RateReview';
 import PrintIcon from '@material-ui/icons/Print';
 import PeopleIcon from '@material-ui/icons/People';
 import Modal from '@material-ui/core/Modal';
 import axios from 'axios';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
+import ErrorForm from './errorForm'
 const theme = createMuiTheme({
   palette: {
     primary:green
   },
 });
-
+const hostpath = 'http://localhost'
 function rand() {
   return Math.round(Math.random() * 20) - 10;
 }
@@ -98,8 +97,9 @@ const useStyles = makeStyles(theme => ({
     return <MuiAlert elevation={6} variant="filled" {...props} />;
   }
  // Hàm submit form gửi API đến server
-export default function FormMasterDataCustomer(){
+export default function FormMasterDataCustomer(props){
     const classes = useStyles();
+    
     const [open, setOpen] = React.useState(false);
     const [openAlert , setOpenAlert] = React.useState(false)
     const [lictradnum , setLicTradNum] = React.useState({
@@ -130,7 +130,42 @@ export default function FormMasterDataCustomer(){
       Name              : '',
       Address           : '',
     })
-    
+    const [vaildate , setValidate] = React.useState({
+      isError:false,
+      isMess:''
+    })
+    function validateForm(event){
+      const input = event.target.name
+      const value = event.target.value
+      switch(input){
+        case 'Phone1':
+          const reg =   /^0[1-9][0-9]{8,9}$/;
+          const checkResult = reg.exec(value)
+          console.log(checkResult)
+          if(checkResult == null)
+          {
+            setValidate({
+              isError:true,
+              isMess:"Phone 1 lỗi"
+            })
+            setLicTradNum({
+              ...lictradnum,
+              Button:false
+            })
+          }
+          else{
+            setValidate({
+              isError:false,
+              isMess:""
+            })
+            setLicTradNum({
+              ...lictradnum,
+              Button:true
+            })
+          }
+        break;
+      }
+    }
     function handleChange(event){
       const value = event.target.value;
       const name = event.target.name
@@ -161,7 +196,7 @@ export default function FormMasterDataCustomer(){
     function submitCustomForm() {
       axios({
         method: 'post',
-        url: 'http://localhost/api/masterdata-customer',
+        url: `${hostpath}/api/masterdata-customer`,
         headers:{
           'Content-Type':'application/json',
           'auth-hbg':localStorage.getItem('authen-hbg').toString()
@@ -171,9 +206,13 @@ export default function FormMasterDataCustomer(){
         },
         responseType:'json'
       }).then((res)=>{
+       
         if(res.data.mess){
           setOpenAlert(true)
-        }else console.log(res.data.errors)
+        }else console.log('None')
+      }).catch(e => {
+        localStorage.removeItem('authen-hbg')
+        window.location.reload()
       })
         // setState({
         //   CardName          : '', 
@@ -199,11 +238,12 @@ export default function FormMasterDataCustomer(){
         
       handleClose()
     };
+
     function checkLicTradNum(event){
       const value = event.target.value
       axios({
         method: 'post',
-        url: 'http://localhost/api/masterdata-customer/lictradnum',
+        url: `${hostpath}/api/masterdata-customer/lictradnum`,
         headers:{
           'Content-Type':'application/json',
           'auth-hbg':localStorage.getItem('authen-hbg').toString()
@@ -242,6 +282,11 @@ export default function FormMasterDataCustomer(){
                 {/* Đầu Form Tạo mã khách hàng */}
                 <form  method="post">
                   {/* Chia form */}
+                  <ErrorForm 
+                    isError={vaildate.isError}
+                    isMess = {vaildate.isMess}
+                  />
+                 
                   <Grid container xs={12} spacing={3}>
                     {/* nhóm khách hàng */}
                   <Grid item xs={12} md={4}>
@@ -254,6 +299,7 @@ export default function FormMasterDataCustomer(){
                       name="GroupCode"
                       value={state.GroupCode}
                       onChange={handleChange}
+                      required
                       fullWidth>
                         <MenuItem value="02_Cust_Đại_Lý">02_Cust_Đại_Lý</MenuItem>
                         <MenuItem value="03_Cust_Dự_Án">03_Cust_Dự_Án</MenuItem>
@@ -274,6 +320,7 @@ export default function FormMasterDataCustomer(){
                       name="CmpPrivate"
                       value={state.CmpPrivate}
                       onChange={handleChange}
+                      required
                     >
                         <MenuItem value="">
                         <em>None</em>
@@ -298,6 +345,7 @@ export default function FormMasterDataCustomer(){
                       value = {state.LicTradNum}
                       onChange = {handleChange}
                       onBlur = {checkLicTradNum}
+                      
                     />
                   </FormControl>
                     </Grid>
@@ -315,6 +363,7 @@ export default function FormMasterDataCustomer(){
                       name="CardName"
                       value = {state.CardName}
                       onChange = {handleChange}
+                      required
                     />
                   </FormControl>
                     </Grid>
@@ -332,6 +381,7 @@ export default function FormMasterDataCustomer(){
                       name="Name"
                       value = {state.Name}
                       onChange = {handleChange}
+                      required
                     />
                   </FormControl>
                     </Grid>
@@ -367,6 +417,7 @@ export default function FormMasterDataCustomer(){
                       name="Phone1"
                       value = {state.Phone1}
                       onChange = {handleChange}
+                      onBlur={validateForm}
                     />
                   </FormControl>
                     </Grid>
@@ -433,7 +484,8 @@ export default function FormMasterDataCustomer(){
                       name="GroupNum"
                       value = {state.GroupNum}
                       onChange={handleChange}
-                      fullWidth>
+                      fullWidth
+                      required>
                       <MenuItem value="">
                         <em>None</em>
                         </MenuItem>
@@ -460,6 +512,7 @@ export default function FormMasterDataCustomer(){
                       name="CreditLine"
                       value = {state.CreditLine}
                       onChange = {handleChange}
+                      required
                     />
                   </FormControl>
                     </Grid>
@@ -483,6 +536,7 @@ export default function FormMasterDataCustomer(){
                         name="Address"
                         value = {state.Address}
                         onChange={handleChange}
+                        required
                       />
                     </FormControl>
                       </Grid>
@@ -501,6 +555,7 @@ export default function FormMasterDataCustomer(){
                         name="City"
                         value = {state.City}
                         onChange={handleChange}
+                        required
                       />
                     </FormControl>
                       </Grid>
@@ -519,6 +574,7 @@ export default function FormMasterDataCustomer(){
                         value = {state.Country}
                         onChange = {handleChange}
                         placeholder="VIỆT NAM"
+                        required
                       />
                     </FormControl>
                       </Grid>
