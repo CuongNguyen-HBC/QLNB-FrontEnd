@@ -142,7 +142,7 @@ export default function FormMasterDataCustomer(props){
           const reg =   /^0[1-9][0-9]{8,9}$/;
           const checkResult = reg.exec(value)
           console.log(checkResult)
-          if(checkResult == null)
+          if(checkResult === null)
           {
             setValidate({
               isError:true,
@@ -173,7 +173,7 @@ export default function FormMasterDataCustomer(props){
         ...state,
         [name]: value
       });
-      if(state.GroupCode == '03_Cust_Dự_Án' || state.GroupCode == '05_Cust_Xuất_Khẩu'){
+      if(state.GroupCode === '03_Cust_Dự_Án' || state.GroupCode === '05_Cust_Xuất_Khẩu'){
         setState({
             ...state,
            [name]: value,
