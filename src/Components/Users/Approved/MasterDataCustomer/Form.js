@@ -32,7 +32,7 @@ const theme = createMuiTheme({
     primary:green
   },
 });
-const hostpath = 'http://localhost'
+const hostpath = 'http://localhost:8080'
 function rand() {
   return Math.round(Math.random() * 20) - 10;
 }
