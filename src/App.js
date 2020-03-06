@@ -23,7 +23,7 @@ export default class App extends Component {
       <div className="App">
           <Router>
           <Route path="/Login" component={Login} />
-          <PrivateRoute path="/" component={Index} exact  />
+          <PrivateRoute path="/" component={FormApproved} exact  />
           <PrivateRoute path="/masterdata-customer" component={FormApproved} exact />
           </Router>
       </div>

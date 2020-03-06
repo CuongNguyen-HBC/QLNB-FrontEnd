@@ -1,6 +1,6 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Typography,Paper,Input,Container,CssBaseline, FormControl,InputLabel,Select,MenuItem, Box,createMuiTheme,ThemeProvider, Icon } from '@material-ui/core';
+import { Typography,Paper,Input,Divider,CssBaseline, FormControl,InputLabel,Select,MenuItem, Box,createMuiTheme,ThemeProvider, Icon } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button'
 import AccountCircle from '@material-ui/icons/AccountCircle';
@@ -76,11 +76,12 @@ const useStyles = makeStyles(theme => ({
     },
     modal: {
       position: 'absolute',
-      width:"95%",
-      top:`30%`,
-      left:`50%`,
+      width:"50%",
+      marginTop:'15%',
+      marginLeft:"15%",
       boxShadow: theme.shadows[5],
       padding: theme.spacing(2, 4, 3),
+      // transform: `translate(50%, 50%)`,
     },
     buttonaction:{
       marginTop:5,
@@ -92,6 +93,9 @@ const useStyles = makeStyles(theme => ({
     },
     cardview:{
       position:"fixed"
+    },
+    errorform:{
+      minHeight:100
     }
   }));
   
@@ -112,7 +116,7 @@ export default function FormMasterDataCustomer(props){
           CardName:'',
           Company:'',
           Open:false,
-          Button : false
+          Button : true
     })
     const [state,setState] = React.useState({
       CardName          : '', 
@@ -133,7 +137,7 @@ export default function FormMasterDataCustomer(props){
       City              : '',
       Country           : '',
       Name              : '',
-      Address           : '',
+      Address           : '123',
     })
     const [vaildate , setValidate] = React.useState({
       isError:false,
@@ -141,38 +145,34 @@ export default function FormMasterDataCustomer(props){
     })
     // Hàm check lỗi nhập người dùng
     function validateForm(event){
-      const input = event.target.name
-      const value = event.target.value
-      switch(input){
-        case 'Phone1':
-          const reg =   /^0[1-9][0-9]{8,9}$/;
-          const checkResult = reg.exec(value)
-          console.log(checkResult)
-          if(checkResult === null)
-          {
-            setValidate({
-              isError:true,
-              isMess:"Phone 1 lỗi"
-            })
-            setLicTradNum({
-              ...lictradnum,
-              Button:false
-            })
-          }
-          else{
-            setValidate({
-              isError:false,
-              isMess:""
-            })
-            setLicTradNum({
-              ...lictradnum,
-              Button:true
-            })
-          }
-        break;
-        
-
+      // const input = event.target.name
+      // const value = event.target.value
+      // switch(input){
+      //   case 'Phone1':
+      //     const reg =   /^0[1-9][0-9]{8,9}$/;
+      //     const checkResult = reg.exec(value)
+      const field = []
+      field['CardName'] = 'Tên khách hàng'
+      field['Name'] = 'Người đại diện'
+      field['Phone1'] = "Số điện thoại 1"
+      field['Address'] = 'Địa chỉ'
+      field['City'] = 'Tỉnh thành'
+      field['GroupNum'] = 'Thời hạn nợ'
+      field['CreditLine'] = 'Hạn mức công nợ'
+      field['CmpPrivate'] = 'Loại khách hàng'
+      field['LicTradNum'] = 'Mã số thuế'
+      field['GroupCode'] = 'Nhóm khách hàng'
+      for(var i in state)
+      {
+        if(state[i] === '' && (['Country','State','Block','Street','StreetNo','Tel1','Tel2','Phone2','Fax'].indexOf(i) === -1 )){
+          setValidate({
+            isError:true,
+            isMess:`Trường không được bỏ trống ${field[i]}`
+          })
+          return false
+        }  
       }
+      return true
     }
     function handleChange(event){
       const value = event.target.value;
@@ -185,14 +185,72 @@ export default function FormMasterDataCustomer(props){
             CreditLine:'Theo hợp đồng',
             CmpPrivate:'Tổ chức'
         })
-      }
-      else{
+        if(state.LicTradNum === '')
+          {
+            setLicTradNum({
+              Button:false
+            })
+            setValidate({
+              isError:true,
+              isMess:"Bắt buộc có mã số thuế"
+            })
+          }else{
+            setLicTradNum({
+              Button:false
+            })
+            setValidate({
+              isError:false,
+              isMess:''
+            })
+          }
+      }else{
         setState({
           ...state,
           [name]: value
-        
         });
+        setLicTradNum({
+          Button:false
+        })
+        setValidate({
+          isError:false,
+          isMess:''
+        })
+        if((name === 'GroupCode' && value.match('04_Cust_Lẻ') === null) || !state.GroupCode.match('04_Cust_Lẻ') === null){
+          setState({
+            ...state,
+           [name]: value,
+            CmpPrivate:'Tổ chức'
+        })
+          if(state.LicTradNum === '')
+          {
+            setLicTradNum({
+              Button:false
+            })
+            setValidate({
+              isError:true,
+              isMess:"Bắt buộc có mã số thuế"
+            })
+          }else{
+            setLicTradNum({
+              Button:false
+            })
+            setValidate({
+              isError:false,
+              isMess:''
+            })
+          }
+        }
+        else{
+          setLicTradNum({
+            Button:false
+          })
+          setValidate({
+            isError:false,
+            isMess:''
+          })}
       }
+      
+      
 
      }
     const handleCloseAlert = () => {
@@ -255,7 +313,15 @@ export default function FormMasterDataCustomer(props){
         
       handleClose()
     };
-
+    function checkedForm(){
+      const check = validateForm()
+      if(check)
+      {
+        setLicTradNum({
+          Button:true
+        })
+      }
+    }
     function checkLicTradNum(event){
       const value = event.target.value
       axios({
@@ -301,13 +367,14 @@ export default function FormMasterDataCustomer(props){
             <Grid item xs={7}>
               <Paper elevation={3} >
                 {/* Đầu Form Tạo mã khách hàng */}
-                <form  method="post" onFocus={validateForm}>
+                <form  method="post" onBlur={checkedForm}>
                   {/* Chia form */}
-                  <ErrorForm 
+                  <ErrorForm  
                     isError={vaildate.isError}
                     isMess = {vaildate.isMess}
                   />
-                 
+                   <Divider />
+                
                   <Grid container xs={12} spacing={3}>
                     {/* nhóm khách hàng */}
                   <Grid item xs={12} md={4}>
@@ -373,7 +440,7 @@ export default function FormMasterDataCustomer(props){
                         {/* Cửa hàng */}
                     <Grid item xs={12} md={4}>
                       <FormControl className={classes.margin} fullWidth>
-                    <InputLabel htmlFor="input-with-icon-adornment" className={classes.inputlabel} >CỬA HÀNG</InputLabel>
+                    <InputLabel htmlFor="input-with-icon-adornment" className={classes.inputlabel} >TÊN KHÁCH HÀNG</InputLabel>
                     <Input
                       id="input-with-icon-adornment"
                       startAdornment={
@@ -438,7 +505,7 @@ export default function FormMasterDataCustomer(props){
                       name="Phone1"
                       value = {state.Phone1}
                       onChange = {handleChange}
-                      onBlur={validateForm}
+                      
                     />
                   </FormControl>
                     </Grid>
@@ -581,7 +648,7 @@ export default function FormMasterDataCustomer(props){
                     </FormControl>
                       </Grid>
                       {/* Quốc gia */}
-                      <Grid container xs={12}>
+                      {/* <Grid container xs={12}>
                       <FormControl className={classes.margin} fullWidth>
                       <InputLabel htmlFor="input-with-icon-adornment" className={classes.inputlabel}>QUỐC GIA</InputLabel>
                       <Input
@@ -598,7 +665,7 @@ export default function FormMasterDataCustomer(props){
                         required
                       />
                     </FormControl>
-                      </Grid>
+                      </Grid> */}
                       </Box>
                       {/* end Box */}
                       {/* Button Gửi */}
@@ -624,8 +691,8 @@ export default function FormMasterDataCustomer(props){
               <CardActionArea >
                 <CardContent>
                 <Typography variant="h4"  >Hiển thị trên hợp đồng</Typography>
-                <Typography variant="h6" component="h6" align="left">Nhóm khách hàng</Typography>       <Typography color="error"  align="left">{state.GroupCode}</Typography>
-                <Typography variant="h6" component="h6"  align="left">Loại kinh doanh</Typography>      <Typography color="error"  align="left">{state.CmpPrivate}</Typography>
+                {/* <Typography variant="h6" component="h6" align="left">Nhóm khách hàng</Typography>       <Typography color="error"  align="left">{state.GroupCode}</Typography>
+                <Typography variant="h6" component="h6"  align="left">Loại kinh doanh</Typography>      <Typography color="error"  align="left">{state.CmpPrivate}</Typography> */}
                 <Typography variant="h6" component="h6"  align="left">Mã số thuế:</Typography>          <Typography color="error"  align="left">{state.LicTradNum}</Typography>
                 <Typography variant="h6" component="h6"  align="left">Cửa hàng</Typography>             <Typography color="error"  align="left">{state.CardName}</Typography>
                 <Typography variant="h6" component="h6"  align="left">Người đại diện</Typography>       <Typography color="error"  align="left">{state.Name}</Typography>
@@ -637,7 +704,7 @@ export default function FormMasterDataCustomer(props){
                 <Typography variant="h6" component="h6"  align="left">Thời hạn nợ</Typography>          <Typography color="error"  align="left">{state.GroupNum}</Typography>
                 <Typography variant="h6" component="h6"  align="left">Hạn mức công nợ </Typography>     <Typography color="error"  align="left">{state.CreditLine}</Typography>
                 <Typography variant="h6" component="h6"  align="left">Tỉnh thành</Typography>           <Typography color="error"  align="left">{state.City}</Typography>
-                <Typography variant="h6" component="h6"  align="left">Quốc gia</Typography  >           <Typography color="error"  align="left">{state.Country}</Typography>
+                {/* <Typography variant="h6" component="h6"  align="left">Quốc gia</Typography  >           <Typography color="error"  align="left">{state.Country}</Typography> */}
                 </CardContent> 
               </CardActionArea>
             </Card>
@@ -661,8 +728,8 @@ export default function FormMasterDataCustomer(props){
               <CardActionArea>
               <CardContent>
                 <Typography variant="h4"  >Hiển thị trên hợp đồng</Typography>
-                <Typography variant="h6" component="h6">Nhóm khách hàng</Typography>      <Typography color="error">{state.GroupCode}</Typography>
-                <Typography variant="h6" component="h6">Loại kinh doanh</Typography>      <Typography color="error">{state.CmpPrivate}</Typography>
+                {/* <Typography variant="h6" component="h6">Nhóm khách hàng</Typography>      <Typography color="error">{state.GroupCode}</Typography>
+                <Typography variant="h6" component="h6">Loại kinh doanh</Typography>      <Typography color="error">{state.CmpPrivate}</Typography> */}
                 <Typography variant="h6" component="h6">Mã số thuế:</Typography>          <Typography color="error">{state.LicTradNum}</Typography>
                 <Typography variant="h6" component="h6">Cửa hàng</Typography>             <Typography color="error">{state.CardName}</Typography>
                 <Typography variant="h6" component="h6">Người đại diện</Typography>       <Typography color="error">{state.Name}</Typography>
@@ -674,7 +741,7 @@ export default function FormMasterDataCustomer(props){
                 <Typography variant="h6" component="h6">Thời hạn nợ</Typography>          <Typography color="error">{state.GroupNum}</Typography>
                 <Typography variant="h6" component="h6">Hạn mức công nợ </Typography>     <Typography color="error">{state.CreditLine}</Typography>
                 <Typography variant="h6" component="h6">Tỉnh thành</Typography>           <Typography color="error">{state.City}</Typography>
-                <Typography variant="h6" component="h6">Quốc gia</Typography  >           <Typography color="error">{state.Country}</Typography>
+                {/* <Typography variant="h6" component="h6">Quốc gia</Typography  >           <Typography color="error">{state.Country}</Typography> */}
                 </CardContent> 
               </CardActionArea>
               <CardActions>
@@ -696,14 +763,16 @@ export default function FormMasterDataCustomer(props){
         aria-describedby="simple-modal-description"
         open={lictradnum.Open}
         onClose={handleCloseLicTradNum}
-        className={classes.modal}
         
       >
-          <Card className={classes.cardview}>
+          <Card className={classes.modal}>
               <CardActionArea>
                 <CardContent>
                         <Typography variant="h4" component="h4">
                           Thông tin mã số thuế
+                        </Typography>
+                        <Typography variant="h6" component="p" color="error">
+                         (Vui lòng liên hệ: Nguyễn Hoàng Đạo - 0902306388 để thêm khách hàng mới)
                         </Typography>
                         <Typography variant="h6" component="h6">CardCode</Typography>      <Typography color="error">{lictradnum.CardCode}</Typography>
                         <Typography variant="h6" component="h6">Cửa hàng</Typography>      <Typography color="error">{lictradnum.CardName}</Typography>
