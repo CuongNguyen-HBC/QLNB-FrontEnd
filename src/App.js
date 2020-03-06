@@ -4,6 +4,7 @@ import Header from './Header'
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import FormApproved from './Components/Users/Approved/MasterDataCustomer/Form'
 import Login from './Components/Users/Login'
+import Index from './Components/Page/Index'
 import PrivateRoute from './Router/PrivateRoute'
 import React, { Component } from 'react'
 import axios from 'axios';
@@ -20,13 +21,11 @@ export default class App extends Component {
     return (
      
       <div className="App">
-      <Header />
-      <Container maxWidth="xl">
           <Router>
-            <Route path="/Login" component={Login} />
-          <PrivateRoute path="/masterdata-customer" component={FormApproved}  />
+          <Route path="/Login" component={Login} />
+          <PrivateRoute path="/" component={Index} exact  />
+          <PrivateRoute path="/masterdata-customer" component={FormApproved} exact />
           </Router>
-      </Container>
       </div>
     )
   }

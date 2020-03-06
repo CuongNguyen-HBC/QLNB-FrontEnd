@@ -23,7 +23,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import HomeIcon from '@material-ui/icons/Home';
 import GroupAddIcon from '@material-ui/icons/GroupAdd';
-import { Link } from '@material-ui/core';
+import { Link, CardMedia } from '@material-ui/core';
 const useStyles = makeStyles(theme => ({
     list: {
         width: 250,
@@ -90,9 +90,13 @@ const useStyles = makeStyles(theme => ({
       display: 'none',
     },
   },
+  media:{
+    height:100
+  }
 }));
 
 export default function PrimarySearchAppBar() {
+  const fullname = localStorage.getItem('fullname')
   const classes = useStyles();
   const [state, setState] = React.useState({
     top: false,
@@ -137,18 +141,23 @@ export default function PrimarySearchAppBar() {
       onClick={toggleDrawer(side, false)}
       onKeyDown={toggleDrawer(side, false)}
     >
+      <CardMedia
+         className={classes.media}
+         image="https://bambooairway.vn/public/uploads/data/images/news/nhung-canh-dep-nuc-tieng-hap-dan-khach-du-lich-o-quy-nhon-2.jpg"
+         title="Contemplative Reptile"
+         />
       <List>
         {/* Trang chủ */}
-       
+        
           <ListItem button key="Trang chủ" component={Link}  href="./">
             <ListItemIcon><HomeIcon/></ListItemIcon>
             <ListItemText primary="Trang chủ"/>
           </ListItem>
         {/* Email */}
-          <ListItem button key="Hộp Thư">
+          {/* <ListItem button key="Hộp Thư">
             <ListItemIcon><MailIcon/></ListItemIcon>
             <ListItemText primary="Hộp Thư"/>
-          </ListItem>
+          </ListItem> */}
         {/* Tạo mã khách hàng */}
         <ListItem button key="Tạo Mã Khách Hàng" component={Link}  href="./masterdata-customer">
             <ListItemIcon><GroupAddIcon/></ListItemIcon>
@@ -156,18 +165,19 @@ export default function PrimarySearchAppBar() {
           </ListItem>
       </List>
       <Divider />
-      <List>
+      {/* <List>
         {['All mail', 'Trash', 'Spam'].map((text, index) => (
           <ListItem button key={text}>
             <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
             <ListItemText primary={text} />
           </ListItem>
         ))}
-      </List>
+      </List> */}
     </div>
   );
 
   const renderMenu = (
+   
     <Menu
       anchorEl={anchorEl}
       anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
@@ -180,7 +190,7 @@ export default function PrimarySearchAppBar() {
       <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
       <MenuItem onClick={handleMenuClose}>My account</MenuItem>
     </Menu>
-  );
+  )
 
   const mobileMenuId = 'primary-search-account-menu-mobile';
   const renderMobileMenu = (
@@ -253,7 +263,8 @@ export default function PrimarySearchAppBar() {
             />
           </div>
           <div className={classes.grow} />
-          <div className={classes.sectionDesktop}>
+          Hi ! {fullname}
+          {/* <div className={classes.sectionDesktop}>
             <IconButton aria-label="show 4 new mails" color="inherit">
               <Badge badgeContent={4} color="secondary">
                 <MailIcon />
@@ -285,7 +296,7 @@ export default function PrimarySearchAppBar() {
             >
               <MoreIcon />
             </IconButton>
-          </div>
+          </div> */}
         </Toolbar>
         <Drawer open={state.left} onClose={toggleDrawer('left', false)}>
         {sideList('left')}

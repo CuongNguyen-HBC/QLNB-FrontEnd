@@ -27,12 +27,15 @@ import axios from 'axios';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 import ErrorForm from './errorForm'
+import Header from '../../../../Header'
+import Footer from '../../../../Footer' 
 const theme = createMuiTheme({
   palette: {
     primary:green
   },
 });
-const hostpath = 'http://localhost:8080'
+const hostpath =  process.env.REACT_APP_API_HOST ||'http://192.168.3.111:8080'
+console.log( process.env.REACT_APP_API_HOST )
 function rand() {
   return Math.round(Math.random() * 20) - 10;
 }
@@ -51,8 +54,8 @@ const useStyles = makeStyles(theme => ({
       '& .MuiTextField-root': {
         margin: theme.spacing(1),
       },
-      marginTop:20
-      
+      marginTop:20,
+      margin:10
     },
     margin: {
       margin: theme.spacing(1),
@@ -101,13 +104,15 @@ export default function FormMasterDataCustomer(props){
     const classes = useStyles();
     
     const [open, setOpen] = React.useState(false);
+    
     const [openAlert , setOpenAlert] = React.useState(false)
     const [lictradnum , setLicTradNum] = React.useState({
           LicTradNum :'',
           CardCode :'',
           CardName:'',
           Company:'',
-          Button : true
+          Open:false,
+          Button : false
     })
     const [state,setState] = React.useState({
       CardName          : '', 
@@ -134,6 +139,7 @@ export default function FormMasterDataCustomer(props){
       isError:false,
       isMess:''
     })
+    // Hàm check lỗi nhập người dùng
     function validateForm(event){
       const input = event.target.name
       const value = event.target.value
@@ -164,16 +170,14 @@ export default function FormMasterDataCustomer(props){
             })
           }
         break;
+        
+
       }
     }
     function handleChange(event){
       const value = event.target.value;
       const name = event.target.name
-      setState({
-        ...state,
-        [name]: value
-      });
-      if(state.GroupCode === '03_Cust_Dự_Án' || state.GroupCode === '05_Cust_Xuất_Khẩu'){
+      if((name === 'GroupCode' && (value === '03_Cust_Dự_Án' || value === '05_Cust_Xuất_Khẩu')) || (state.GroupCode === '03_Cust_Dự_Án' || state.GroupCode === '05_Cust_Xuất_Khẩu') ){
         setState({
             ...state,
            [name]: value,
@@ -182,6 +186,14 @@ export default function FormMasterDataCustomer(props){
             CmpPrivate:'Tổ chức'
         })
       }
+      else{
+        setState({
+          ...state,
+          [name]: value
+        
+        });
+      }
+
      }
     const handleCloseAlert = () => {
       setOpenAlert(false);
@@ -192,7 +204,11 @@ export default function FormMasterDataCustomer(props){
     const handleClose = () => {
       setOpen(false);
     };
-   
+    const handleCloseLicTradNum = () => {
+      setLicTradNum({
+        Open:false
+      })
+    }
     function submitCustomForm() {
       axios({
         method: 'post',
@@ -212,29 +228,30 @@ export default function FormMasterDataCustomer(props){
         }else console.log('None')
       }).catch(e => {
         localStorage.removeItem('authen-hbg')
+        localStorage.removeItem('fullname')
         window.location.reload()
       })
-        // setState({
-        //   CardName          : '', 
-        //   GroupCode         : '',   
-        //   CmpPrivate        : '',     
-        //   LicTradNum        : '',     
-        //   Phone1            : '',    
-        //   Phone2            : '',
-        //   Tel1              : '',
-        //   Tel2              : '',
-        //   Fax               : '',
-        //   GroupNum          : '',    
-        //   CreditLine        : '',    
-        //   StreetNo          : '',
-        //   Street            : '',
-        //   Block             : '',
-        //   State             : '',
-        //   City              : '',
-        //   Country           : '',
-        //   Name              : '',
-        //   Address           : '',
-        // })
+        setState({
+          CardName          : '', 
+          GroupCode         : '',   
+          CmpPrivate        : '',     
+          LicTradNum        : '',     
+          Phone1            : '',    
+          Phone2            : '',
+          Tel1              : '',
+          Tel2              : '',
+          Fax               : '',
+          GroupNum          : '',    
+          CreditLine        : '',    
+          StreetNo          : '',
+          Street            : '',
+          Block             : '',
+          State             : '',
+          City              : '',
+          Country           : '',
+          Name              : '',
+          Address           : '',
+        })
         
       handleClose()
     };
@@ -256,7 +273,8 @@ export default function FormMasterDataCustomer(props){
         if(res.data.length <= 0){
         setLicTradNum({
           ...lictradnum,
-          Button:true
+          Button:true,
+          
         })
       }
         else{
@@ -267,7 +285,8 @@ export default function FormMasterDataCustomer(props){
               LicTradNum:i.LicTradNum,
               CardCode:i.CardCode,
               CardName:i.CardName,
-              Company:i.Company
+              Company:i.Company,
+              Open:true
             })
           })
         }
@@ -275,12 +294,14 @@ export default function FormMasterDataCustomer(props){
     }
     
     return (
-      <div className={classes.root}>
-          <Grid container xs={12} md={12} spacing={3} >
+      
+      <div>
+        <Header />
+          <Grid container xs={12} md={12} spacing={3} className={classes.root} >
             <Grid item xs={7}>
               <Paper elevation={3} >
                 {/* Đầu Form Tạo mã khách hàng */}
-                <form  method="post">
+                <form  method="post" onFocus={validateForm}>
                   {/* Chia form */}
                   <ErrorForm 
                     isError={vaildate.isError}
@@ -600,35 +621,23 @@ export default function FormMasterDataCustomer(props){
             <Grid item xs={5}>
               <Paper elevation={3}>
               <Card className={classes.cardview}>
-              <CardActionArea>
+              <CardActionArea >
                 <CardContent>
                 <Typography variant="h4"  >Hiển thị trên hợp đồng</Typography>
-                <Typography variant="h6" component="h6">Nhóm khách hàng</Typography>      <Typography color="error">{state.GroupCode}</Typography>
-                <Typography variant="h6" component="h6">Loại kinh doanh</Typography>      <Typography color="error">{state.CmpPrivate}</Typography>
-                <Typography variant="h6" component="h6">Mã số thuế:</Typography>          <Typography color="error">{state.LicTradNum}</Typography>
-                <Typography variant="h6" component="h6">Cửa hàng</Typography>             <Typography color="error">{state.CardName}</Typography>
-                <Typography variant="h6" component="h6">Người đại diện</Typography>       <Typography color="error">{state.Name}</Typography>
-                <Typography variant="h6" component="h6">Địa chỉ</Typography>              <Typography color="error">{state.Address}</Typography>
-                <Typography variant="h6" component="h6">Số điện thoại 1</Typography>      <Typography color="error">{state.Phone1}</Typography>
-                <Typography variant="h6" component="h6">Số điện thoại 2</Typography>      <Typography color="error">{state.Phone2}</Typography>
-                <Typography variant="h6" component="h6">Số điện thoại 3</Typography>      <Typography color="error">{state.Tel1}</Typography>
-                <Typography variant="h6" component="h6">Số điện thoại 4</Typography>      <Typography color="error">{state.Tel2}</Typography>
-                <Typography variant="h6" component="h6">Thời hạn nợ</Typography>          <Typography color="error">{state.GroupNum}</Typography>
-                <Typography variant="h6" component="h6">Hạn mức công nợ </Typography>     <Typography color="error">{state.CreditLine}</Typography>
-                <Typography variant="h6" component="h6">Tỉnh thành</Typography>           <Typography color="error">{state.City}</Typography>
-                <Typography variant="h6" component="h6">Quốc gia</Typography  >           <Typography color="error">{state.Country}</Typography>
-                </CardContent> 
-              </CardActionArea>
-              <CardActionArea>
-                <CardContent>
-                        <Typography variant="h4" component="h4">
-                          Thông tin mã số thuế
-                        </Typography>
-                        <Typography variant="h6" component="h6">CardCode</Typography>      <Typography color="error">{lictradnum.CardCode}</Typography>
-                        <Typography variant="h6" component="h6">Cửa hàng</Typography>      <Typography color="error">{lictradnum.CardName}</Typography>
-                        <Typography variant="h6" component="h6">Mã số thuế</Typography>      <Typography color="error">{lictradnum.LicTradNum}</Typography>
-                        <Typography variant="h6" component="h6">Giao dịch với</Typography>      <Typography color="error">{lictradnum.Company}</Typography>
-                        
+                <Typography variant="h6" component="h6" align="left">Nhóm khách hàng</Typography>       <Typography color="error"  align="left">{state.GroupCode}</Typography>
+                <Typography variant="h6" component="h6"  align="left">Loại kinh doanh</Typography>      <Typography color="error"  align="left">{state.CmpPrivate}</Typography>
+                <Typography variant="h6" component="h6"  align="left">Mã số thuế:</Typography>          <Typography color="error"  align="left">{state.LicTradNum}</Typography>
+                <Typography variant="h6" component="h6"  align="left">Cửa hàng</Typography>             <Typography color="error"  align="left">{state.CardName}</Typography>
+                <Typography variant="h6" component="h6"  align="left">Người đại diện</Typography>       <Typography color="error"  align="left">{state.Name}</Typography>
+                <Typography variant="h6" component="h6"  align="left">Địa chỉ</Typography>              <Typography color="error"  align="left">{state.Address}</Typography>
+                <Typography variant="h6" component="h6"  align="left">Số điện thoại 1</Typography>      <Typography color="error"  align="left">{state.Phone1}</Typography>
+                <Typography variant="h6" component="h6"  align="left">Số điện thoại 2</Typography>      <Typography color="error"  align="left">{state.Phone2}</Typography>
+                <Typography variant="h6" component="h6"  align="left">Số điện thoại 3</Typography>      <Typography color="error"  align="left">{state.Tel1}</Typography>
+                <Typography variant="h6" component="h6"  align="left">Số điện thoại 4</Typography>      <Typography color="error"  align="left">{state.Tel2}</Typography>
+                <Typography variant="h6" component="h6"  align="left">Thời hạn nợ</Typography>          <Typography color="error"  align="left">{state.GroupNum}</Typography>
+                <Typography variant="h6" component="h6"  align="left">Hạn mức công nợ </Typography>     <Typography color="error"  align="left">{state.CreditLine}</Typography>
+                <Typography variant="h6" component="h6"  align="left">Tỉnh thành</Typography>           <Typography color="error"  align="left">{state.City}</Typography>
+                <Typography variant="h6" component="h6"  align="left">Quốc gia</Typography  >           <Typography color="error"  align="left">{state.Country}</Typography>
                 </CardContent> 
               </CardActionArea>
             </Card>
@@ -636,6 +645,7 @@ export default function FormMasterDataCustomer(props){
             </Grid>
             {/* Cuối Card hiển thị thông tin người dùng nhập */}
           </Grid>
+          {/* Đầu Card xác nhận thông tin người dùng nhập */}
           <Modal
         aria-labelledby="simple-modal-title"
         aria-describedby="simple-modal-description"
@@ -679,6 +689,32 @@ export default function FormMasterDataCustomer(props){
             </Grid>
           </Grid>
       </Modal>
+      {/* Cuối card xác nhận thông tin người dùng nhập*/}
+      {/* Đầu card Hiển thị mã số thuế nếu có*/}
+      <Modal
+        aria-labelledby="simple-modal-title"
+        aria-describedby="simple-modal-description"
+        open={lictradnum.Open}
+        onClose={handleCloseLicTradNum}
+        className={classes.modal}
+        
+      >
+          <Card className={classes.cardview}>
+              <CardActionArea>
+                <CardContent>
+                        <Typography variant="h4" component="h4">
+                          Thông tin mã số thuế
+                        </Typography>
+                        <Typography variant="h6" component="h6">CardCode</Typography>      <Typography color="error">{lictradnum.CardCode}</Typography>
+                        <Typography variant="h6" component="h6">Cửa hàng</Typography>      <Typography color="error">{lictradnum.CardName}</Typography>
+                        <Typography variant="h6" component="h6">Mã số thuế</Typography>      <Typography color="error">{lictradnum.LicTradNum}</Typography>
+                        <Typography variant="h6" component="h6">Giao dịch với</Typography>      <Typography color="error">{lictradnum.Company}</Typography>
+ 
+                </CardContent> 
+              </CardActionArea>
+            </Card>
+      </Modal>
+      {/* Cuối Card hiển thị mã số thuế nếu có*/}
       <Snackbar open={openAlert} autoHideDuration={1000} onClose={handleCloseAlert}>
         <Alert onClose={handleCloseAlert} severity="success">
           Gửi thành công
