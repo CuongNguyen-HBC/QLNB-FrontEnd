@@ -149,7 +149,7 @@ export default function PrimarySearchAppBar() {
       <List>
         {/* Trang chủ */}
         
-          <ListItem button key="Trang chủ" component={Link}  href="./">
+          <ListItem button key="Trang chủ" component={Link}  href="../">
             <ListItemIcon><HomeIcon/></ListItemIcon>
             <ListItemText primary="Trang chủ"/>
           </ListItem>
@@ -159,9 +159,14 @@ export default function PrimarySearchAppBar() {
             <ListItemText primary="Hộp Thư"/>
           </ListItem> */}
         {/* Tạo mã khách hàng */}
-        <ListItem button key="Tạo Mã Khách Hàng" component={Link}  href="./masterdata-customer">
+        <ListItem button key="Tạo Mã Khách Hàng" component={Link}  href="../masterdata-customer">
             <ListItemIcon><GroupAddIcon/></ListItemIcon>
             <ListItemText primary="Tạo Mã Khách Hàng"/>
+          </ListItem>
+        {/* Theo dõi mã khách hàng được tạo */}
+          <ListItem button key="Danh sách khách hàng được tạo" component={Link}  href="../masterdata-customer/list">
+            <ListItemIcon><GroupAddIcon/></ListItemIcon>
+            <ListItemText primary="Danh sách khách hàng được tạo"/>
           </ListItem>
       </List>
       <Divider />

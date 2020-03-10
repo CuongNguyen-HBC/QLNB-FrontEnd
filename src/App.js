@@ -6,6 +6,7 @@ import FormApproved from './Components/Users/Approved/MasterDataCustomer/Form'
 import Login from './Components/Users/Login'
 import Index from './Components/Page/Index'
 import PrivateRoute from './Router/PrivateRoute'
+import RequestList from './Components/Users/Approved/MasterDataCustomer/requestList'
 import React, { Component } from 'react'
 import axios from 'axios';
 export default class App extends Component {
@@ -25,6 +26,7 @@ export default class App extends Component {
           <Route path="/Login" component={Login} />
           <PrivateRoute path="/" component={FormApproved} exact  />
           <PrivateRoute path="/masterdata-customer" component={FormApproved} exact />
+          <PrivateRoute path="/masterdata-customer/list" component={RequestList} exact />
           </Router>
       </div>
     )

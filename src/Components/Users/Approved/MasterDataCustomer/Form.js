@@ -35,7 +35,7 @@ const theme = createMuiTheme({
   },
 });
 const hostpath =  process.env.REACT_APP_API_HOST ||'http://192.168.3.111:8080'
-console.log( process.env.REACT_APP_API_HOST )
+
 function rand() {
   return Math.round(Math.random() * 20) - 10;
 }
@@ -137,7 +137,7 @@ export default function FormMasterDataCustomer(props){
       City              : '',
       Country           : '',
       Name              : '',
-      Address           : '123',
+      Address           : '',
     })
     const [vaildate , setValidate] = React.useState({
       isError:false,
