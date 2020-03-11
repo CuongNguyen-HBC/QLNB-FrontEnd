@@ -77,7 +77,7 @@ const useStyles = makeStyles(theme => ({
     modal: {
       position: 'absolute',
       width:"50%",
-      marginTop:'15%',
+      marginTop:'5%',
       marginLeft:"15%",
       boxShadow: theme.shadows[5],
       padding: theme.spacing(2, 4, 3),
@@ -108,7 +108,12 @@ export default function FormMasterDataCustomer(props){
     const classes = useStyles();
     
     const [open, setOpen] = React.useState(false);
-    
+    const [disable , setDisable] = React.useState({
+      CmpPrivate:false,
+      GroupNum:false,
+      CreditLine:true,
+      Days:false
+    }) 
     const [openAlert , setOpenAlert] = React.useState(false)
     const [lictradnum , setLicTradNum] = React.useState({
           LicTradNum :'',
@@ -116,7 +121,7 @@ export default function FormMasterDataCustomer(props){
           CardName:'',
           Company:'',
           Open:false,
-          Button : true
+          Button : false
     })
     const [state,setState] = React.useState({
       CardName          : '', 
@@ -154,9 +159,9 @@ export default function FormMasterDataCustomer(props){
       const field = []
       field['CardName'] = 'Tên khách hàng'
       field['Name'] = 'Người đại diện'
-      field['Phone1'] = "Số điện thoại 1"
+      field['Phone1'] = "Số điện thoại "
       field['Address'] = 'Địa chỉ'
-      field['City'] = 'Tỉnh thành'
+      field['City'] = 'Khu vực'
       field['GroupNum'] = 'Thời hạn nợ'
       field['CreditLine'] = 'Hạn mức công nợ'
       field['CmpPrivate'] = 'Loại khách hàng'
@@ -167,17 +172,17 @@ export default function FormMasterDataCustomer(props){
         if(state[i] === '' && (['Country','State','Block','Street','StreetNo','Tel1','Tel2','Phone2','Fax'].indexOf(i) === -1 )){
           setValidate({
             isError:true,
-            isMess:`Trường không được bỏ trống ${field[i]}`
+            isMess:`${field[i]} không được bỏ trống`
           })
           return false
-        }  
+        }
       }
       return true
     }
     function handleChange(event){
       const value = event.target.value;
       const name = event.target.name
-      if((name === 'GroupCode' && (value === '03_Cust_Dự_Án' || value === '05_Cust_Xuất_Khẩu')) || (state.GroupCode === '03_Cust_Dự_Án' || state.GroupCode === '05_Cust_Xuất_Khẩu') ){
+      if(name ==="GroupCode" &&['03_Cust_Dự_Án','05_Cust_Xuất_Khẩu'].indexOf(value) !== -1 ){
         setState({
             ...state,
            [name]: value,
@@ -185,69 +190,42 @@ export default function FormMasterDataCustomer(props){
             CreditLine:'Theo hợp đồng',
             CmpPrivate:'Tổ chức'
         })
-        if(state.LicTradNum === '')
-          {
-            setLicTradNum({
-              Button:false
-            })
-            setValidate({
-              isError:true,
-              isMess:"Bắt buộc có mã số thuế"
-            })
-          }else{
-            setLicTradNum({
-              Button:false
-            })
-            setValidate({
-              isError:false,
-              isMess:''
-            })
-          }
+        setDisable({
+          CmpPrivate:false,
+          
+        })
+      }
+      else if(name === "GroupCode" && ['02_Cust_Đại_Lý'].indexOf(value) !== -1){
+        setState({
+          ...state,
+         [name]: value,
+          CmpPrivate:'Tổ chức'
+          })
+          setDisable({
+          CmpPrivate:false,
+          GroupNum:true,
+          CreditLine:true,
+          Days:true
+          })
+      }
+      else if(name === "GroupCode" && ['02_Cust_Lẻ'].indexOf(value) === -1){
+        setState({
+          ...state,
+          CreditLine:'none',
+          [name]: value
+        });
+        setDisable({
+          CmpPrivate:true,
+          GroupNum:true,
+          CreditLine:false,
+          Days:false,
+        })
       }else{
         setState({
           ...state,
           [name]: value
         });
-        setLicTradNum({
-          Button:false
-        })
-        setValidate({
-          isError:false,
-          isMess:''
-        })
-        if((name === 'GroupCode' && value.match('04_Cust_Lẻ') === null) || !state.GroupCode.match('04_Cust_Lẻ') === null){
-          setState({
-            ...state,
-           [name]: value,
-            CmpPrivate:'Tổ chức'
-        })
-          if(state.LicTradNum === '')
-          {
-            setLicTradNum({
-              Button:false
-            })
-            setValidate({
-              isError:true,
-              isMess:"Bắt buộc có mã số thuế"
-            })
-          }else{
-            setLicTradNum({
-              Button:false
-            })
-            setValidate({
-              isError:false,
-              isMess:''
-            })
-          }
-        }
-        else{
-          setLicTradNum({
-            Button:false
-          })
-          setValidate({
-            isError:false,
-            isMess:''
-          })}
+        
       }
       
       
@@ -319,6 +297,15 @@ export default function FormMasterDataCustomer(props){
       {
         setLicTradNum({
           Button:true
+        })
+        setValidate({
+          isError:false,
+          
+        })
+      }else 
+      {
+        setLicTradNum({
+          Button:false
         })
       }
     }
@@ -408,7 +395,7 @@ export default function FormMasterDataCustomer(props){
                       name="CmpPrivate"
                       value={state.CmpPrivate}
                       onChange={handleChange}
-                      required
+                      disabled = {!disable.CmpPrivate}
                     >
                         <MenuItem value="">
                         <em>None</em>
@@ -494,7 +481,7 @@ export default function FormMasterDataCustomer(props){
                     
                     <Grid item xs={12} md={4}>
                       <FormControl className={classes.margin} fullWidth>
-                    <InputLabel htmlFor="input-with-icon-adornment" className={classes.inputlabel}>SỐ ĐIỆN THOẠI 1</InputLabel>
+                    <InputLabel htmlFor="input-with-icon-adornment" className={classes.inputlabel}>SỐ ĐIỆN THOẠI </InputLabel>
                     <Input
                       id="input-with-icon-adornment"
                       startAdornment={
@@ -573,13 +560,14 @@ export default function FormMasterDataCustomer(props){
                       value = {state.GroupNum}
                       onChange={handleChange}
                       fullWidth
+                      disabled={!disable.GroupNum}
                       required>
                       <MenuItem value="">
                         <em>None</em>
                         </MenuItem>
-                        <MenuItem value="10 ngày">10 ngày</MenuItem>
-                        <MenuItem value="20 ngày">20 ngày</MenuItem>
-                        <MenuItem value="30 ngày">30 ngày</MenuItem>
+                        <MenuItem disabled={!disable.Days} value="10 ngày">10 ngày</MenuItem>
+                        <MenuItem disabled={!disable.Days} value="20 ngày">20 ngày</MenuItem>
+                        <MenuItem disabled={!disable.Days} value="30 ngày">30 ngày</MenuItem>
                         <MenuItem value="Theo hợp đồng">Theo hợp đồng</MenuItem>
                         <MenuItem value="Thanh toán tiền mặt">Thanh toán tiền mặt</MenuItem>
                      </Select>
@@ -600,7 +588,7 @@ export default function FormMasterDataCustomer(props){
                       name="CreditLine"
                       value = {state.CreditLine}
                       onChange = {handleChange}
-                      required
+                      disabled={!disable.CreditLine}
                     />
                   </FormControl>
                     </Grid>
@@ -631,7 +619,7 @@ export default function FormMasterDataCustomer(props){
                       {/* Tỉnh thành */}
                       <Grid container xs={12}>
                       <FormControl className={classes.margin} fullWidth>
-                      <InputLabel htmlFor="input-with-icon-adornment" className={classes.inputlabel}>TỈNH THÀNH</InputLabel>
+                      <InputLabel htmlFor="input-with-icon-adornment" className={classes.inputlabel}>KHU VỰC</InputLabel>
                       <Input
                         id="input-with-icon-adornment"
                         startAdornment={
@@ -697,13 +685,10 @@ export default function FormMasterDataCustomer(props){
                 <Typography variant="h6" component="h6"  align="left">Cửa hàng</Typography>             <Typography color="error"  align="left">{state.CardName}</Typography>
                 <Typography variant="h6" component="h6"  align="left">Người đại diện</Typography>       <Typography color="error"  align="left">{state.Name}</Typography>
                 <Typography variant="h6" component="h6"  align="left">Địa chỉ</Typography>              <Typography color="error"  align="left">{state.Address}</Typography>
-                <Typography variant="h6" component="h6"  align="left">Số điện thoại 1</Typography>      <Typography color="error"  align="left">{state.Phone1}</Typography>
-                <Typography variant="h6" component="h6"  align="left">Số điện thoại 2</Typography>      <Typography color="error"  align="left">{state.Phone2}</Typography>
-                <Typography variant="h6" component="h6"  align="left">Số điện thoại 3</Typography>      <Typography color="error"  align="left">{state.Tel1}</Typography>
-                <Typography variant="h6" component="h6"  align="left">Số điện thoại 4</Typography>      <Typography color="error"  align="left">{state.Tel2}</Typography>
+                <Typography variant="h6" component="h6"  align="left">Số điện thoại</Typography>      <Typography color="error"  align="left">{state.Phone1}</Typography>
                 <Typography variant="h6" component="h6"  align="left">Thời hạn nợ</Typography>          <Typography color="error"  align="left">{state.GroupNum}</Typography>
                 <Typography variant="h6" component="h6"  align="left">Hạn mức công nợ </Typography>     <Typography color="error"  align="left">{state.CreditLine}</Typography>
-                <Typography variant="h6" component="h6"  align="left">Tỉnh thành</Typography>           <Typography color="error"  align="left">{state.City}</Typography>
+                <Typography variant="h6" component="h6"  align="left">Khu vực</Typography>           <Typography color="error"  align="left">{state.City}</Typography>
                 {/* <Typography variant="h6" component="h6"  align="left">Quốc gia</Typography  >           <Typography color="error"  align="left">{state.Country}</Typography> */}
                 </CardContent> 
               </CardActionArea>
@@ -718,16 +703,16 @@ export default function FormMasterDataCustomer(props){
         aria-describedby="simple-modal-description"
         open={open}
         onClose={handleClose}
-        className={classes.modal}
+        
         
       >
           <Grid container xs={12} >
             <Grid item xs={12}>
             <Paper elevation={3}>
-              <Card  >
+              <Card  className={classes.modal}>
               <CardActionArea>
               <CardContent>
-                <Typography variant="h4"  >Hiển thị trên hợp đồng</Typography>
+                <Typography variant="h4"  >Kiểm tra thông tin</Typography>
                 {/* <Typography variant="h6" component="h6">Nhóm khách hàng</Typography>      <Typography color="error">{state.GroupCode}</Typography>
                 <Typography variant="h6" component="h6">Loại kinh doanh</Typography>      <Typography color="error">{state.CmpPrivate}</Typography> */}
                 <Typography variant="h6" component="h6">Mã số thuế:</Typography>          <Typography color="error">{state.LicTradNum}</Typography>
@@ -740,7 +725,7 @@ export default function FormMasterDataCustomer(props){
                 <Typography variant="h6" component="h6">Số điện thoại 4</Typography>      <Typography color="error">{state.Tel2}</Typography>
                 <Typography variant="h6" component="h6">Thời hạn nợ</Typography>          <Typography color="error">{state.GroupNum}</Typography>
                 <Typography variant="h6" component="h6">Hạn mức công nợ </Typography>     <Typography color="error">{state.CreditLine}</Typography>
-                <Typography variant="h6" component="h6">Tỉnh thành</Typography>           <Typography color="error">{state.City}</Typography>
+                <Typography variant="h6" component="h6">Khu vực</Typography>           <Typography color="error">{state.City}</Typography>
                 {/* <Typography variant="h6" component="h6">Quốc gia</Typography  >           <Typography color="error">{state.Country}</Typography> */}
                 </CardContent> 
               </CardActionArea>
