@@ -228,7 +228,6 @@ export default function FormMasterDataCustomer(props){
         setState({
           ...state,
           [name]: value,
-          CreditLine:''
         });
         
       }
