@@ -1,8 +1,6 @@
 import React from 'react';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import MaterialTable from 'material-table';
-import TableCell from '@material-ui/core/TableCell'
-import TableRow from '@material-ui/core/TableRow'
 import Paper from '@material-ui/core/Paper';
 import Header from '../../../../Header'
 import { Container, Box,Typography,Grid } from '@material-ui/core';
@@ -49,31 +47,6 @@ const tableIcons = {
 
 
 const hostpath =  process.env.REACT_APP_API_HOST ||'http://192.168.3.111:8080'
-const StyledTableCell = withStyles(theme => ({
-  head: {
-    backgroundColor: theme.palette.common.black,
-    color: theme.palette.common.white,
-  },
-  body: {
-    fontSize: 14,
-  },
-}))(TableCell);
-
-const StyledTableRow = withStyles(theme => ({
-  root: {
-    '&:nth-of-type(odd)': {
-      backgroundColor: theme.palette.background.default,
-    },
-  },
-}))(TableRow);
-
-function createData(cardcode,cardname,name,lictradnum,phone1,status) {
-  console.log(cardcode,status)
-  return { CardCode:cardcode,CardName:cardname,Name:name,FederalTaxID:lictradnum,Phone1:phone1,Status:status };
-}
-
-
-
 
 const useStyles = makeStyles({
   table: {
@@ -98,7 +71,9 @@ export default function CustomizedTables() {
      }).then(res => {
       let rows = [];
       res.data.forEach(el => {
-          rows.push({ CardCode:el.CardCode,CardName:el.CardName,Name:el.Name,FederalTaxID:el.FederalTaxID,Phone1:el.Phone1,Status:el.Status == 1 ? <Typography color="primary">'Đã duyệt'</Typography> : el.Status == 0 ? 'Đợi duyệt' : <Typography color="error"> Thất bại </Typography> })
+        const date = new Date(el.Created_at)
+        const created_at = `${date.getUTCDate()}/${date.getUTCMonth()+1}/${date.getUTCFullYear()}`
+          rows.push({ CardCode:el.CardCode,CardName:el.CardName,Name:el.Name,FederalTaxID:el.FederalTaxID,Phone1:el.Phone1,Status:el.Status == 1 ? <Typography color="secondary">Đã duyệt</Typography> : el.Status == 0 ? 'Đợi duyệt' : <Typography color="error"> Thất bại </Typography>,Created_at:created_at })
       });
       setState({
         data:rows
@@ -121,11 +96,10 @@ export default function CustomizedTables() {
                 title="Tạo mã khách hàng"
                 icons={tableIcons}
                 columns={ [
-                  { title: 'CardCode', field: 'CardCode', },
-                  { title: 'Khách hàng', field: 'CardName' },
-                  { title: 'Người đại diện', field: 'Name'},
+                  { title: 'Mã KH(ERP)', field: 'CardCode', },
+                  { title: 'Tên khách hàng', field: 'CardName' },
                   { title:'Mã số thuế', field:'FederalTaxID' },
-                  { title:'Số điện thoại', field:'Phone1' },
+                  { title:'Ngày yêu cầu', field:'Created_at' },
                   { title:'Trạng thái', field:'Status' },
                 ]}
                 data={state.data} />

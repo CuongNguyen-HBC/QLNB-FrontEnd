@@ -24,6 +24,7 @@ import InboxIcon from '@material-ui/icons/MoveToInbox';
 import HomeIcon from '@material-ui/icons/Home';
 import GroupAddIcon from '@material-ui/icons/GroupAdd';
 import { Link, CardMedia } from '@material-ui/core';
+import ListIcon from '@material-ui/icons/List';
 const useStyles = makeStyles(theme => ({
     list: {
         width: 250,
@@ -165,8 +166,8 @@ export default function PrimarySearchAppBar() {
           </ListItem>
         {/* Theo dõi mã khách hàng được tạo */}
           <ListItem button key="Danh sách khách hàng được tạo" component={Link}  href="../masterdata-customer/list">
-            <ListItemIcon><GroupAddIcon/></ListItemIcon>
-            <ListItemText primary="Danh sách khách hàng được tạo"/>
+            <ListItemIcon><ListIcon/></ListItemIcon>
+            <ListItemText primary="Danh sách yêu cầu tạo mã KH"/>
           </ListItem>
       </List>
       <Divider />

@@ -112,7 +112,8 @@ export default function FormMasterDataCustomer(props){
       CmpPrivate:false,
       GroupNum:false,
       CreditLine:true,
-      Days:false
+      Days:false,
+      Contract:true
     }) 
     const [openAlert , setOpenAlert] = React.useState(false)
     const [lictradnum , setLicTradNum] = React.useState({
@@ -199,13 +200,15 @@ export default function FormMasterDataCustomer(props){
         setState({
           ...state,
          [name]: value,
-          CmpPrivate:'Tổ chức'
+          CmpPrivate:'Tổ chức',
+          CreditLine:''
           })
           setDisable({
           CmpPrivate:false,
           GroupNum:true,
           CreditLine:true,
-          Days:true
+          Days:true,
+          Contract:false
           })
       }
       else if(name === "GroupCode" && ['02_Cust_Lẻ'].indexOf(value) === -1){
@@ -219,11 +222,13 @@ export default function FormMasterDataCustomer(props){
           GroupNum:true,
           CreditLine:false,
           Days:false,
+          Contract:true
         })
       }else{
         setState({
           ...state,
-          [name]: value
+          [name]: value,
+          CreditLine:''
         });
         
       }
@@ -562,13 +567,10 @@ export default function FormMasterDataCustomer(props){
                       fullWidth
                       disabled={!disable.GroupNum}
                       required>
-                      <MenuItem value="">
-                        <em>None</em>
-                        </MenuItem>
                         <MenuItem disabled={!disable.Days} value="10 ngày">10 ngày</MenuItem>
                         <MenuItem disabled={!disable.Days} value="20 ngày">20 ngày</MenuItem>
                         <MenuItem disabled={!disable.Days} value="30 ngày">30 ngày</MenuItem>
-                        <MenuItem value="Theo hợp đồng">Theo hợp đồng</MenuItem>
+                        <MenuItem disabled={!disable.Contract} value="Theo hợp đồng">Theo hợp đồng</MenuItem>
                         <MenuItem value="Thanh toán tiền mặt">Thanh toán tiền mặt</MenuItem>
                      </Select>
                    
