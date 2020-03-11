@@ -11,7 +11,7 @@ export default function errorForm(props){
                         </Typography>
                   </Grid>
                   <Grid item xs={7}>
-                        <Typography variant="h6" component="h6" color="error">
+                        <Typography variant="subtitle1"  color="error" >
                         {props.isMess}
                         </Typography>
                   </Grid>
