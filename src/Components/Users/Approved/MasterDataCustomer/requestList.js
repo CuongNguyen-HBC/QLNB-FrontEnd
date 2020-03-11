@@ -73,7 +73,7 @@ export default function CustomizedTables() {
       res.data.forEach(el => {
         const date = new Date(el.Created_at)
         const created_at = `${date.getUTCDate()}/${date.getUTCMonth()+1}/${date.getUTCFullYear()}`
-          rows.push({ CardCode:el.CardCode,CardName:el.CardName,Name:el.Name,FederalTaxID:el.FederalTaxID,Phone1:el.Phone1,Status:el.Status == 1 ? <Typography color="secondary">Đã duyệt</Typography> : el.Status == 0 ? 'Đợi duyệt' : <Typography color="error"> Thất bại </Typography>,Created_at:created_at })
+          rows.push({ CardCode:el.CardCode,CardName:el.CardName,Name:el.Name,FederalTaxID:el.FederalTaxID,Phone1:el.Phone1,Status:el.Status == 1 ? <Typography color="primary">Đã duyệt</Typography> : el.Status == 0 ? 'Đang tạo ...' : <Typography color="error"> Thất bại </Typography>,Created_at:created_at })
       });
       setState({
         data:rows
