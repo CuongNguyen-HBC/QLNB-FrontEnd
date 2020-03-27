@@ -34,7 +34,7 @@ const theme = createMuiTheme({
     primary:green
   },
 });
-const hostpath =  process.env.REACT_APP_API_HOST ||'http://192.168.3.111:8080'
+const hostpath =  process.env.REACT_APP_API_HOST ||'http://qlnb.hbc.com.vn:8080'
 
 function rand() {
   return Math.round(Math.random() * 20) - 10;
@@ -169,14 +169,27 @@ export default function FormMasterDataCustomer(props){
       field['LicTradNum'] = 'Mã số thuế'
       field['GroupCode'] = 'Nhóm khách hàng'
       for(var i in state)
-      {
-        if(state[i] === '' && (['Country','State','Block','Street','StreetNo','Tel1','Tel2','Phone2','Fax'].indexOf(i) === -1 )){
-          setValidate({
-            isError:true,
-            isMess:`${field[i]} không được bỏ trống`
-          })
-          return false
+      { 
+        if(state.CmpPrivate.search('Cá nhân') === 0 ){
+          if(state[i] === '' && (['Country','State','Block','Street','StreetNo','Tel1','Tel2','Phone2','Fax','LicTradNum'].indexOf(i) === -1 )){
+            setValidate({
+              isError:true,
+              isMess:`${field[i]} không được bỏ trống`
+            })
+            return false
+          }
         }
+        else{
+          if(state[i] === '' && (['Country','State','Block','Street','StreetNo','Tel1','Tel2','Phone2','Fax'].indexOf(i) === -1 )){
+            setValidate({
+              isError:true,
+              isMess:`${field[i]} không được bỏ trống`
+            })
+            return false
+          }
+        }
+        
+        
       }
       return true
     }
@@ -193,7 +206,6 @@ export default function FormMasterDataCustomer(props){
         })
         setDisable({
           CmpPrivate:false,
-          
         })
       }
       else if(name === "GroupCode" && ['02_Cust_Đại_Lý'].indexOf(value) !== -1){
@@ -215,6 +227,7 @@ export default function FormMasterDataCustomer(props){
         setState({
           ...state,
           CreditLine:'none',
+          LicTradNum:'',
           [name]: value
         });
         setDisable({
@@ -424,7 +437,6 @@ export default function FormMasterDataCustomer(props){
                       value = {state.LicTradNum}
                       onChange = {handleChange}
                       onBlur = {checkLicTradNum}
-                      
                     />
                   </FormControl>
                     </Grid>
@@ -748,8 +760,7 @@ export default function FormMasterDataCustomer(props){
         aria-labelledby="simple-modal-title"
         aria-describedby="simple-modal-description"
         open={lictradnum.Open}
-        onClose={handleCloseLicTradNum}
-        
+        onClose={handleCloseLicTradNum}  
       >
           <Card className={classes.modal}>
               <CardActionArea>

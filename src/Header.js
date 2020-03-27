@@ -13,7 +13,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import MailIcon from '@material-ui/icons/Mail';
 import NotificationsIcon from '@material-ui/icons/Notifications';
-import MoreIcon from '@material-ui/icons/MoreVert';
+import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
 import Drawer from '@material-ui/core/Drawer';
 import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
@@ -25,12 +25,21 @@ import HomeIcon from '@material-ui/icons/Home';
 import GroupAddIcon from '@material-ui/icons/GroupAdd';
 import { Link, CardMedia } from '@material-ui/core';
 import ListIcon from '@material-ui/icons/List';
+import ExpandLess from '@material-ui/icons/ExpandLess';
+import ExpandMore from '@material-ui/icons/ExpandMore';
+import LabelImportantIcon from '@material-ui/icons/LabelImportant';
+import Collapse from '@material-ui/core/Collapse';
+import EditIcon from '@material-ui/icons/Edit';
+
 const useStyles = makeStyles(theme => ({
     list: {
         width: 250,
       },
         fullList: {
         width: 'auto',
+    },
+    nested: {
+      paddingLeft: theme.spacing(4),
     },
   grow: {
     flexGrow: 1,
@@ -107,7 +116,10 @@ export default function PrimarySearchAppBar() {
   });
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
-
+  const [opensubmenu, setOpenSubMenu] = React.useState(false);
+  const handleClick = () => {
+    setOpenSubMenu(!opensubmenu);
+  };
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
@@ -139,7 +151,6 @@ export default function PrimarySearchAppBar() {
     <div
       className={classes.list}
       role="presentation"
-      onClick={toggleDrawer(side, false)}
       onKeyDown={toggleDrawer(side, false)}
     >
       <CardMedia
@@ -160,25 +171,40 @@ export default function PrimarySearchAppBar() {
             <ListItemText primary="Hộp Thư"/>
           </ListItem> */}
         {/* Tạo mã khách hàng */}
+        <ListItem button onClick={handleClick}>
+        <ListItemIcon>
+          <AssignmentIndIcon />
+        </ListItemIcon>
+        <ListItemText primary="Quản lý đối tác" />
+        {opensubmenu ? <ExpandLess /> : <ExpandMore />}
+      </ListItem>
+      <Collapse in={opensubmenu} timeout="auto" unmountOnExit>
+        <List component="div" disablePadding>
         <ListItem button key="Tạo Mã Khách Hàng" component={Link}  href="../masterdata-customer">
             <ListItemIcon><GroupAddIcon/></ListItemIcon>
             <ListItemText primary="Tạo Mã Khách Hàng"/>
           </ListItem>
         {/* Theo dõi mã khách hàng được tạo */}
-          <ListItem button key="Danh sách khách hàng được tạo" component={Link}  href="../masterdata-customer/list">
-            <ListItemIcon><ListIcon/></ListItemIcon>
+          <ListItem button key="Danh sách khách hàng được tạo" component={Link}  href="../masterdata-customer/list-request">
+            <ListItemIcon><LabelImportantIcon/></ListItemIcon>
             <ListItemText primary="Danh sách yêu cầu tạo mã KH"/>
           </ListItem>
+          {/* Danh sách các khách hàng */}
+          <ListItem button key="Danh sách khách hàng" component={Link}  href="../masterdata-customer/list-customer">
+            <ListItemIcon><ListIcon/></ListItemIcon>
+            <ListItemText primary="Danh sách khách hàng"/>
+          </ListItem>
+          {/* Chỉnh sửa khách hàng */}
+          <ListItem button key="Chỉnh sửa khách hàng" component={Link}  href="../masterdata-customer/update-customer">
+            <ListItemIcon><EditIcon /></ListItemIcon>
+            <ListItemText primary="Chỉnh sửa khách hàng"/>
+          </ListItem>
+        </List>
+      </Collapse>
+        
       </List>
       <Divider />
-      {/* <List>
-        {['All mail', 'Trash', 'Spam'].map((text, index) => (
-          <ListItem button key={text}>
-            <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-            <ListItemText primary={text} />
-          </ListItem>
-        ))}
-      </List> */}
+     
     </div>
   );
 

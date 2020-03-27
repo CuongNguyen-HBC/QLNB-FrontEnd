@@ -18,7 +18,7 @@ export default function Login(){
       }
       const useStyles = makeStyles(theme => ({
         root:{
-            marginTop:"10%",
+            marginTop:"20%",
         },
         media: {
             height:500,
@@ -29,9 +29,8 @@ export default function Login(){
     const classes = useStyles();
        
         return (
-            <div className={classes.root}>
-                <Container maxWidth="md">
-                    <Box boxShadow={3}  >
+                <Container maxWidth="md" >
+                    <Box boxShadow={3}  className={classes.root}>
                         <Grid container>
                             <Grid item xs={6}>
                             <CardMedia
@@ -74,7 +73,6 @@ export default function Login(){
                     
                 </Container>
                 
-            </div>
         )
     
 }
